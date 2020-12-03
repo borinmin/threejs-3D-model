@@ -11,7 +11,7 @@
         import { OrbitControls } from 'https://unpkg.com/three@0.120.1/examples/jsm/controls/OrbitControls.js';
         import { GLTFLoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/GLTFLoader.js';
         import { RGBELoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/RGBELoader.js';
-        import { RoughnessMipmapper } from 'https://unpkg.com/three@0.120.1/examples/jsm/utils/RoughnessMipmapper.js';
+        // import { RoughnessMipmapper } from 'https://unpkg.com/three@0.120.1/examples/jsm/utils/RoughnessMipmapper.js';
         // import { SpriteText2D, textAlign } from 'three-text2d';
 
         var viscometer_container, viscometer_arrow,viscometer_container_cover;
@@ -30,45 +30,32 @@
             document.body.appendChild( container );
 
             camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-            camera.position.set( - 1.8, 0.6, 2.7 );
+            camera.position.set( 0, 0, 10);
 
             scene = new THREE.Scene();
             // var spriteText = new THREE.SpriteText({ text: 'Hello world!' });
             // scene.add( spriteText );
-            
-            new RGBELoader()
-                .setDataType( THREE.UnsignedByteType )
-                .setPath( '/' )
-                .load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-                    var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+            var loader = new GLTFLoader().setPath( '/' );
 
-                    scene.background = envMap;
-                    scene.environment = envMap;
-
-                    texture.dispose();
-                    pmremGenerator.dispose();
-                    console.log("Hi")
-                    var roughnessMipmapper = new RoughnessMipmapper( renderer );
-
-                    var loader = new GLTFLoader().setPath( '/' );
-                    loader.load( 'assignment.gltf', function ( gltf ) {
+            loader.load( 'assignment_v1.gltf', function ( gltf ) {
                         var sceneGraph = gltf.scene;
-                        console.log("sceneGraph",sceneGraph)
+                        // console.log("sceneGraph",sceneGraph)
                         var group = new THREE.Group();
                         sceneGraph.children.forEach(obj => {	
                             if(obj.isMesh && obj.name == "Viscometercontainer-cover"){
-                                console.log("Viscometercontainer-cover")
+                                // console.log("Viscometercontainer-cover",obj)
                                 viscometer_container_cover = obj
                             }else if( obj.isMesh && obj.name == "Viscometercontainer"){
                                 viscometer_container = obj    
                                 console.log("Viscometercontainer")
-                                viscometer_container_cover = obj
                             }else if( obj.isMesh && obj.name == "Viscometerarrow"){
                                 viscometer_arrow = obj   
 
                             }else if( obj.isMesh && obj.name == "Cubestand"){
                                 cube_stand = obj   
+                                console.log("cube_stand",cube_stand)
+                                
                             }else if( obj.isMesh && obj.name == "Cubevisco"){
                                 cube_viscometer = obj   
                             }else if( obj.isMesh && obj.name == "Cubemounting"){
@@ -111,30 +98,67 @@
                         })
                         // console.log(group)
                         // scene.add( gltf.scene );
-                        const material = new THREE.MeshBasicMaterial( { color: 0x32a852, wireframe: false } );
-                        const material1 = new THREE.MeshBasicMaterial( { color: 0xeb8034, wireframe: false
-                                                                       } );
+                        const material = new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe:  true } );
+                        const material1 = new THREE.MeshBasicMaterial( { color: 0xeb8034, wireframe: true } );
+                        //viscometer_container_cover
                         viscometer_container_cover.material=material
-                        viscometer_container_cover.scale= new THREE.Vector3({
-                            x:0.5,
-                            y:0.5,
-                            z:0.5
-                        })
-                        console.log("viscometer_container_cover",viscometer_container_cover)
+                        viscometer_container_cover.scale.set(0.1,0.1,0.3)
+                        viscometer_container_cover.position.set(1,0.3,-10)
+                        viscometer_container_cover.color= 0xFF0000
+                        //viscometer_container
+                        viscometer_container.material=material1
+                        viscometer_container.scale.set(0.1,0.1,0.3)
+                        viscometer_container.position.set(1,0.3,-10)
+                        viscometer_container.color= 0xFF0000
                         viscometer_container.material=material1
 
-                        var color_material = new THREE.MeshLambertMaterial();
-                        // var cube = new THREE.Mesh( TensileStrengthBottom, color_material );
-                        // TensileStrengthBottom.color= 0xeb8034
-                        // scene.add( viscometer_container );
+                        //viscometer_arrow
+                        viscometer_arrow.material=material1
+                        viscometer_arrow.scale.set(0.1,0.1,0.3)
+                        viscometer_arrow.position.set(1,0.3,-10)
+                        viscometer_arrow.color= 0xFF0000
+                        
+                        //cube_stand
+                        cube_stand.material=material1
+                        cube_stand.scale.set(0.1,0.5,0.3)
+                        cube_stand.position.set(0.1,0.3,-10)
+                        cube_stand.color= 0xFF0000
+                        // cube_stand.material=material
+
+                        //cube_viscometer
+                        cube_viscometer.material=material1
+                        cube_viscometer.scale.set(0.1,0.5,0.3)
+                        cube_viscometer.position.set(0.1,0.3,-1)
+                        cube_viscometer.color= 0xFF0000
+
+                        //cube_mount
+                        cube_mount.material=material1
+                        cube_mount.scale.set(0.1,0.5,0.3)
+                        cube_mount.position.set(0.1,0.3,-10)
+                        cube_mount.color= 0xFF0000
+
+                        //cylinder_horizontal_pole
+                        cylinder_horizontal_pole.material=material1
+                        cylinder_horizontal_pole.scale.set(0.1,0.5,0.3)
+                        cylinder_horizontal_pole.position.set(0.1,0.3,-10)
+                        cylinder_horizontal_pole.color= 0xFF0000
+
+
                         scene.add( viscometer_container_cover );
-                        roughnessMipmapper.dispose();
+                        scene.add( viscometer_container );
+                        scene.add( viscometer_arrow );
+                        scene.add( cube_stand );
+                        scene.add( cube_mount );
+                        scene.add( cube_viscometer );
+                        scene.add( cylinder_horizontal_pole );
+                     
+
+
+                        // roughnessMipmapper.dispose();
 
                         render();
 
-                    } );
-                } );
-
+                        });
             renderer = new THREE.WebGLRenderer( { antialias: true } );
             renderer.setPixelRatio( window.devicePixelRatio );
             renderer.setSize( window.innerWidth, window.innerHeight );
@@ -149,11 +173,17 @@
             controls = new OrbitControls( camera, renderer.domElement );
             controls.minDistance = 2;
             controls.maxDistance = 10;
-            controls.target.set( 0, 0, - 0.2 );
+            controls.target.set( 0, 0, 0 );
+            controls.keys = {
+                                LEFT: 37, //left arrow
+                                UP: 38, // up arrow
+                                RIGHT: 39, // right arrow
+                                BOTTOM: 40 // down arrow
+                            }
             controls.update();
 
             window.addEventListener( 'resize', onWindowResize, false );
-
+            console.log("controls",controls)
         }
 
         function onWindowResize() {
