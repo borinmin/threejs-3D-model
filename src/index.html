@@ -11,36 +11,51 @@
         import { OrbitControls } from 'https://unpkg.com/three@0.120.1/examples/jsm/controls/OrbitControls.js';
         import { GLTFLoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/GLTFLoader.js';
         import { RGBELoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/RGBELoader.js';
+        import { GUI } from 'https://unpkg.com/three@0.120.1/examples/jsm/libs/dat.gui.module.js';
+
         // import { RoughnessMipmapper } from 'https://unpkg.com/three@0.120.1/examples/jsm/utils/RoughnessMipmapper.js';
         // import { SpriteText2D, textAlign } from 'three-text2d';
 
         var viscometer_container, viscometer_arrow,viscometer_container_cover;
-        var txt_zero,txt_one,txt_two,txt_three,txt_four,txt_five,txt_six,txt_seven,txt_eight,txt_nine,txt_star,txt_shape,plan;
+        var txt_zero,txt_one,txt_two,txt_three,txt_four,txt_five,txt_six,txt_seven,txt_eight,txt_nine,txt_star,txt_shape,panel;
         var plan,cube_stand,cube_viscometer,cube_mount;
         var cylinder_vertical_pole,cylinder_horizontal_pole,cylinder_vertical_pole_small
         var container, controls;
         var camera, scene, renderer;
+        var spinner1,spinner2,spinner_wing1,spinner_wing2
         
         init();
         render();
 
         function init() {
-
+            const params = {
+				enableWind: true,
+				showBall: false,
+				// togglePins: togglePins
+			};
+            const gui = new GUI();
+            gui.add( params, 'enableWind' ).name( 'Shadow' );
+            gui.add( params, 'showBall' ).name( 'Show ball' );
+            // gui.add( params, 'togglePins' ).name( 'Toggle pins' );
+				//
             container = document.createElement( 'div' );
             document.body.appendChild( container );
-
-            camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+            
+            camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.25, 20 );//()
             camera.position.set( 0, 0, 10);
 
             scene = new THREE.Scene();
             // var spriteText = new THREE.SpriteText({ text: 'Hello world!' });
             // scene.add( spriteText );
+            const group = new THREE.Group();
+            var axesHelper = new THREE.AxesHelper( 5 ); // orange line is X, green is Y and Bule is Z (orange, green, blue) 
+            scene.add( axesHelper );
 
             var loader = new GLTFLoader().setPath( '/' );
 
-            loader.load( 'assignment_v1.gltf', function ( gltf ) {
+            loader.load( 'assignment_v4.gltf', function ( gltf ) {
                         var sceneGraph = gltf.scene;
-                        // console.log("sceneGraph",sceneGraph)
+                        console.log("sceneGraph",sceneGraph)
                         var group = new THREE.Group();
                         sceneGraph.children.forEach(obj => {	
                             if(obj.isMesh && obj.name == "Viscometercontainer-cover"){
@@ -56,17 +71,35 @@
                                 cube_stand = obj   
                                 console.log("cube_stand",cube_stand)
                                 
-                            }else if( obj.isMesh && obj.name == "Cubevisco"){
+                            }else if( obj.isMesh && obj.name == "Cubeviscometer"){
                                 cube_viscometer = obj   
-                            }else if( obj.isMesh && obj.name == "Cubemounting"){
+                            }else if( obj.isMesh && obj.name== "Cubemount"){
                                 cube_mount = obj   
+                                console.log("cube mount",cube_mount)
 
                             }else if( obj.isMesh && obj.name == "Cylinderhorizontal-pole"){
                                 cylinder_horizontal_pole = obj   
                             }else if( obj.isMesh && obj.name == "Cylindervertical-pole"){
                                 cylinder_vertical_pole = obj   
-                            }else if( obj.isMesh && obj.name == "Cylindervertical-pole-small"){
-                                cylinder_vertical_pole_small = obj   
+                            }else if( obj.isMesh&&obj.name == "Cylindervertical-pole-small"){
+                                spinner1 = obj   
+                                console.log("spinner1")
+                                
+
+                            }else if( obj.isMesh&&obj.name == "Cubespin-mount"){
+                                spinner2 = obj   
+                                console.log("spinner2")
+                                
+
+                            }else if( obj.isMesh&&obj.name == "Cubewing1"){
+                                spinner_wing1 = obj   
+                                console.log("spinner_wing1")
+                                
+
+                            }else if( obj.isMesh&&obj.name == "Cubewing2"){
+                                spinner_wing2 = obj   
+                                console.log("spinner_wing2")
+                                
 
                             }else if( obj.isMesh && obj.name == "Text000"){
                                 txt_zero = obj   
@@ -92,66 +125,139 @@
                                 txt_star = obj   
                             }else if( obj.isMesh && obj.name == "Text#"){
                                 txt_shape = obj   
-                            }else if( obj.isMesh && obj.name == "Plane"){
-                                plan = obj   
+                            }else if( obj.isMesh && obj.name == "Panel"){
+                                panel = obj   
                             }
                         })
                         // console.log(group)
                         // scene.add( gltf.scene );
-                        const material = new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe:  true } );
+                        const material = new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe:  false } );
                         const material1 = new THREE.MeshBasicMaterial( { color: 0xeb8034, wireframe: true } );
+                        const bottom_stand = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
+                        const h_pole = new THREE.MeshBasicMaterial( { color: 0x900C3F, wireframe: false } );
+                        const cube_mount_mat = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false } );
+                        const panel_mat = new THREE.MeshBasicMaterial( { color: 0x9D9D9D, wireframe: false } );
+                        const viscometer_mat = new THREE.MeshBasicMaterial( { color: 0xF0CD0E, wireframe: false } );
+                        const container_cover_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
+                        const spinner1_mat = new THREE.MeshBasicMaterial( { color: 0x0EF02D, wireframe: true } );
+                        const spinner2_mat = new THREE.MeshBasicMaterial( { color: 0x0EE2F0, wireframe: true } );
+                        const spinner3_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: true } );
+                        const spinner_wing1_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
+                        const spinner_wing2_mat = new THREE.MeshBasicMaterial( { color: 0xFE00B9, wireframe: false } );
+
+                        
+                        // //transparency
+                        // const material = new THREE.MeshPhongMaterial({'FE00B9',
+                        //                                                 opacity: 0.5,
+                        //                                                 transparent: true,
+                        //                                             });
+
+                        // const bottom_stand = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
+                        //cube_stand
+                        panel.material=panel_mat
+                        panel.scale.set(0.3,0.1,0.08)
+                        panel.position.set(1,0.009,0.5) // (0,0,0) center axis
+                        panel.color= 0xFF0001
+                        //cube_stand
+                        cube_stand.material=bottom_stand
+                        cube_stand.scale.set(0.2,0.1,0.1)
+                        cube_stand.position.set(-0.09,0,0) // (0,0,0) center axis
+                        cube_stand.color= 0xFF0001
+                        // cube_stand.rotation.z=Math.PI / 2 //equal to 1.57079632679
+                        //cylinder_vertical_pole
+                        cylinder_vertical_pole.material=h_pole
+                        cylinder_vertical_pole.scale.set(0.1,0.2,0.1)
+                        cylinder_vertical_pole.position.set(0,1.4,0)
+                        cylinder_vertical_pole.color= 0xFF0000
+                        // cylinder_vertical_pole.rotation.z= -0.001
+                        // cylinder_vertical_pole.rotation.x= -0.001
+                        
+                        // cube mount
+                        cube_mount.material=    cube_mount_mat
+                        cube_mount.scale.set(0.15,0.15,0.15)
+                        cube_mount.position.set(0,1.4,0)
+                        cube_mount.color= 0xFF0000
+                        //cylinder_horizontal_pole
+                        cylinder_horizontal_pole.material=h_pole
+                        cylinder_horizontal_pole.scale.set(0.15,0.15,0.2)
+                        cylinder_horizontal_pole.position.set(0.1,1.4,0)
+                        cylinder_horizontal_pole.color= 0xFF0000
+                        cylinder_horizontal_pole.rotation.y= -Math.PI/2
+
+                        //cube_viscometer
+                        cube_viscometer.material=viscometer_mat
+                        cube_viscometer.scale.set(0.1,0.25,0.2)
+                        cube_viscometer.position.set(1.6,1.4,1.25)
+                        cube_viscometer.color= 0xFF0000
                         //viscometer_container_cover
-                        viscometer_container_cover.material=material
-                        viscometer_container_cover.scale.set(0.1,0.1,0.3)
-                        viscometer_container_cover.position.set(1,0.3,-10)
+                        viscometer_container_cover.material=container_cover_mat
+                        viscometer_container_cover.scale.set(0.1,0.07,0.07)
+                        viscometer_container_cover.position.set(1.6,-0.45,0)
                         viscometer_container_cover.color= 0xFF0000
                         //viscometer_container
                         viscometer_container.material=material1
-                        viscometer_container.scale.set(0.1,0.1,0.3)
-                        viscometer_container.position.set(1,0.3,-10)
+                        viscometer_container.scale.set(0.07,0.06,0.07)
+                        viscometer_container.position.set(1.6,-0.5,0)
                         viscometer_container.color= 0xFF0000
                         viscometer_container.material=material1
 
                         //viscometer_arrow
                         viscometer_arrow.material=material1
-                        viscometer_arrow.scale.set(0.1,0.1,0.3)
-                        viscometer_arrow.position.set(1,0.3,-10)
+                        viscometer_arrow.scale.set(0.08,0.09,0.1)
+                        viscometer_arrow.position.set(1.7,-0.8,0)
                         viscometer_arrow.color= 0xFF0000
                         
-                        //cube_stand
-                        cube_stand.material=material1
-                        cube_stand.scale.set(0.1,0.5,0.3)
-                        cube_stand.position.set(0.1,0.3,-10)
-                        cube_stand.color= 0xFF0000
-                        // cube_stand.material=material
+                        // cylinder_vertical_pole_small
+                        //spinner1
+                        spinner1.material=spinner1_mat
+                        spinner1.scale.set(0.08,1,0.1)
+                        spinner1.position.set(1.7,0.3,0)
+                        spinner1.color= 0xFF0000
+                        
+                        //spinner2
+                        spinner2.material=spinner2_mat
+                        spinner2.scale.set(0.05,1,0.05)
+                        spinner2.position.set(1.7,0.3,0)
+                        spinner2.color= 0xFF0000
+                        spinner2.rotation.x=0
+                        spinner2.rotation.y=Math.PI/6
+                        spinner2.rotation.z=0
 
-                        //cube_viscometer
-                        cube_viscometer.material=material1
-                        cube_viscometer.scale.set(0.1,0.5,0.3)
-                        cube_viscometer.position.set(0.1,0.3,-1)
-                        cube_viscometer.color= 0xFF0000
+                        //wing1
+                        spinner_wing1.material=spinner_wing1_mat
+                        spinner_wing1.scale.set(0.1,0.1,0.15)
+                        spinner_wing1.position.set(0.3,-0.7,0)
+                        spinner_wing1.rotation.z=Math.PI/2
+                        //wing2
+                        spinner_wing2.material=spinner_wing2_mat
+                        spinner_wing2.scale.set(0.1,0.1,0.15)
+                        spinner_wing2.position.set(1.6,-0.7,1.35) 
+                        spinner_wing2.rotation.x=0
+                        spinner_wing2.rotation.y=Math.PI/2
+                        spinner_wing2.rotation.z=Math.PI/2
+                        
 
-                        //cube_mount
-                        cube_mount.material=material1
-                        cube_mount.scale.set(0.1,0.5,0.3)
-                        cube_mount.position.set(0.1,0.3,-10)
-                        cube_mount.color= 0xFF0000
-
-                        //cylinder_horizontal_pole
-                        cylinder_horizontal_pole.material=material1
-                        cylinder_horizontal_pole.scale.set(0.1,0.5,0.3)
-                        cylinder_horizontal_pole.position.set(0.1,0.3,-10)
-                        cylinder_horizontal_pole.color= 0xFF0000
-
-
+                        scene.add( panel );
                         scene.add( viscometer_container_cover );
                         scene.add( viscometer_container );
                         scene.add( viscometer_arrow );
                         scene.add( cube_stand );
-                        scene.add( cube_mount );
                         scene.add( cube_viscometer );
                         scene.add( cylinder_horizontal_pole );
-                     
+                        scene.add( cylinder_vertical_pole );
+                        scene.add( cube_mount );
+                        scene.add( spinner1 );
+                        
+                        scene.add( spinner2 );
+                        scene.add( spinner_wing1 );
+                        scene.add( spinner_wing2 );
+                        // scene.add( box_helper );
+                        // scene.add( spinner3 );
+
+                        const box_helper = new THREE.BoxHelper( spinner_wing1 ,0xffff00);
+                        box_helper.material.color.set( 0x00ffff );
+                        scene.add( box_helper );
+
 
 
                         // roughnessMipmapper.dispose();
