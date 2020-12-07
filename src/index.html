@@ -23,21 +23,20 @@
         var container, controls;
         var camera, scene, renderer;
         var spinner1,spinner2,spinner_wing1,spinner_wing2,cylinder
+        var container_opacity;
+
+        // mesh 
+        var container_mat;
         
         init();
         render();
 
         function init() {
-            const params = {
-				enableWind: true,
-				showBall: false,
-				// togglePins: togglePins
-			};
-            const gui = new GUI();
-            gui.add( params, 'enableWind' ).name( 'Shadow' );
-            gui.add( params, 'showBall' ).name( 'Show ball' );
-            // gui.add( params, 'togglePins' ).name( 'Toggle pins' );
-				//
+            
+
+
+
+
             container = document.createElement( 'div' );
             document.body.appendChild( container );
             
@@ -153,21 +152,21 @@
                         })
                         // console.log(group)
                         // scene.add( gltf.scene );
-                        const material = new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe:  false } );
-                        const material1 = new THREE.MeshBasicMaterial( { color: 0xeb8034, wireframe: true } );
-                        const bottom_stand = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
-                        const h_pole = new THREE.MeshBasicMaterial( { color: 0x900C3F, wireframe: false } );
-                        const cube_mount_mat = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false } );
-                        const panel_mat = new THREE.MeshBasicMaterial( { color: 0x9D9D9D, wireframe: false } );
-                        const viscometer_mat = new THREE.MeshBasicMaterial( { color: 0xF0CD0E, wireframe: false } );
-                        const container_cover_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false} );
-                        const spinner1_mat = new THREE.MeshBasicMaterial( { color: 0x0EF02D, wireframe: false } );
-                        const spinner2_mat = new THREE.MeshBasicMaterial( { color: 0x0EE2F0, wireframe: false } );
-                        const spinner3_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
-                        const spinner_wing1_mat = new THREE.MeshBasicMaterial( { color: 0x900C3F, wireframe: false } );
-                        const spinner_wing2_mat = new THREE.MeshBasicMaterial( { color: 0xF900C3F, wireframe: false } );
-                        const cylinder_mat = new THREE.MeshBasicMaterial( { color: 0x999999, wireframe: false } );
-                        const plane_number_mat = new THREE.MeshBasicMaterial( { color: 0x00FF59 , wireframe: false } );
+                        const material          = new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe:  false } );
+                        container_mat     = new THREE.MeshBasicMaterial( { color: 0x00FF59, wireframe: false ,opacity:0.5,transparent:true,depthWrite: false} );
+                        const bottom_stand      = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
+                        const h_pole            = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false } );
+                        const cube_mount_mat    = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false,opacity:0.9,transparent:true,depthWrite: false} );
+                        const panel_mat         = new THREE.MeshBasicMaterial( { color: 0x00FF59, wireframe: false } );
+                        const viscometer_mat    = new THREE.MeshBasicMaterial( { color: 0x007BD1 , wireframe: false } );
+                        const container_cover_mat = new THREE.MeshBasicMaterial( { color: 0x5D6D7E  , wireframe: false} );
+                        const spinner1_mat      = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
+                        const spinner2_mat      = new THREE.MeshBasicMaterial( { color: 0x0EE2F0, wireframe: false } );
+                        const spinner3_mat      = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
+                        const spinner_wing1_mat = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
+                        const spinner_wing2_mat = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
+                        const cylinder_mat      = new THREE.MeshBasicMaterial( { color: 0x92EEE2, wireframe: false, opacity:1,transparent:true,depthWrite: false} );
+                        const plane_number_mat  = new THREE.MeshBasicMaterial( { color: 0x00FF59 , wireframe: false } );
 
                         
                         // //transparency
@@ -178,65 +177,58 @@
 
                         // const bottom_stand = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
                         //cube_stand
+                        
                         panel.material=panel_mat
                         panel.scale.set(0.3,0.1,0.08)
                         panel.position.set(1,0.009,0.5) // (0,0,0) center axis
-                        panel.color= 0xFF0001
+                        panel.name= "Borin"
                         //cube_stand
                         cube_stand.material=bottom_stand
                         cube_stand.scale.set(0.2,0.1,0.1)
                         cube_stand.position.set(-0.09,0,0) // (0,0,0) center axis
-                        cube_stand.color= 0xFF0001
+                        cube_stand.name="HHHHHHH"
                         // cube_stand.rotation.z=Math.PI / 2 //equal to 1.57079632679
                         //cylinder_vertical_pole
                         cylinder_vertical_pole.material=h_pole
                         cylinder_vertical_pole.scale.set(0.1,0.2,0.1)
                         cylinder_vertical_pole.position.set(0,1.4,0)
-                        cylinder_vertical_pole.color= 0xFF0000
                         // cylinder_vertical_pole.rotation.z= -0.001
                         // cylinder_vertical_pole.rotation.x= -0.001
                         
                         // cube mount
-                        cube_mount.material=    cube_mount_mat
+                        cube_mount.material=  cube_mount_mat
                         cube_mount.scale.set(0.15,0.15,0.15)
                         cube_mount.position.set(0,1.4,0)
-                        cube_mount.color= 0xFF0000
                         //cylinder_horizontal_pole
                         cylinder_horizontal_pole.material=h_pole
                         cylinder_horizontal_pole.scale.set(0.15,0.15,0.2)
                         cylinder_horizontal_pole.position.set(0.1,1.4,0)
-                        cylinder_horizontal_pole.color= 0xFF0000
                         cylinder_horizontal_pole.rotation.y= -Math.PI/2
 
                         //cube_viscometer
                         cube_viscometer.material=viscometer_mat
                         cube_viscometer.scale.set(0.1,0.25,0.2)
                         cube_viscometer.position.set(1.6,1.4,1.25)
-                        cube_viscometer.color= 0xFF0000
                         //viscometer_container_cover
                         viscometer_container_cover.material=container_cover_mat
                         viscometer_container_cover.scale.set(0.1,0.07,0.07)
                         viscometer_container_cover.position.set(1.6,-0.45,0)
                         viscometer_container_cover.color= 0xFF0000
                         //viscometer_container
-                        viscometer_container.material=material1
+                        viscometer_container.material=container_mat
                         viscometer_container.scale.set(0.07,0.06,0.07)
                         viscometer_container.position.set(1.6,-0.5,0)
-                        viscometer_container.color= 0xFF0000
-                        viscometer_container.material=material1
 
                         //viscometer_arrow
-                        viscometer_arrow.material=material1
+                        viscometer_arrow.material=container_mat
                         viscometer_arrow.scale.set(0.08,0.09,0.1)
                         viscometer_arrow.position.set(1.7,-0.8,0)
-                        viscometer_arrow.color= 0xFF0000
                         
                         // cylinder_vertical_pole_small
                         //spinner1
                         spinner1.material=spinner1_mat
                         spinner1.scale.set(0.08,1,0.1)
                         spinner1.position.set(1.65,0.3,0)
-                        spinner1.color= 0xFF0000
                         
                         //spinner2
                         spinner2.material=spinner2_mat
@@ -287,7 +279,7 @@
                         // scene.add( spinner2 );
                         scene.add( spinner_wing1 );
                         scene.add( spinner_wing2 );
-                        scene.add( cylinder );
+                        // scene.add( cylinder );
                         scene.add( plane_number );
                         // scene.add( box_helper );
                         // scene.add( spinner3 );
@@ -298,14 +290,52 @@
 
                         scene.add( pointLight );
                         scene.add( pointLightHelper );
+                        // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
+                        var options = {
+                                velx: 0,
+                                vely: 0,
+                                camera: {
+                                    speed: 0.0001
+                                },
+                                stop: function() {
+                                    this.velx = 0;
+                                    this.vely = 0;
+                                },
+                                reset: function() {
+                                    this.velx = 0.1;
+                                    this.vely = 0.1;
+                                    camera.position.z = 75;
+                                    camera.position.x = 0;
+                                    camera.position.y = 0;
+                                    cube.scale.x = 1;
+                                    cube.scale.y = 1;
+                                    cube.scale.z = 1;
+                                    cube.material.wireframe = true;
+                                    container_mat.opacity=1                   
 
+                                }
+                                };
+
+                                const gui = new GUI();
+                                var cam = gui.addFolder('Camera');
+                                cam.add(options.camera, 'speed', 0, 0.0010).listen();
+                                // cam.add(camera.position, 'y', 0, 100).listen();
+                                cam.open();
+                                var container = gui.addFolder('Container');
+                                // container.add(options.container ,'color',).listen()
+                                console.log("container_mat",container_mat)
+                                container.add(container_mat ,'opacity',0,1).name("Opacity").listen() //(,,min,max)
+
+                                container.open()
 
                         // roughnessMipmapper.dispose();
 
                         render();
 
                         });
+            
+            
             renderer = new THREE.WebGLRenderer( { antialias: true } );
              
            
@@ -334,7 +364,22 @@
 
             window.addEventListener( 'resize', onWindowResize, false );
             console.log("controls",controls)
+
+            
         }
+        function onDocumentMouseMove( event ) 
+            {
+                // the following line would stop any other event handler from firing
+                // (such as the mouse's TrackballControls)
+                // event.preventDefault();
+
+                // update sprite position
+                sprite1.position.set( event.clientX, event.clientY - 20, 0 );
+                
+                // update the mouse variable
+                mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+                mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            }
 
         function onWindowResize() {
 
@@ -346,12 +391,18 @@
             render();
 
         }
-
+        // const y = spinner_wing1.rotation.y
+        // spinner_wing1.rotation.y -=y;
         function render() {
             requestAnimationFrame( render );
-            // if(viscometer_container){
-            //     viscometer_container.rotation.z +=0.01;
-            // }
+            console.log("dddd",spinner_wing1);
+            if(spinner_wing1){
+                // spinner_wing1.rotation.x +=0.01;
+                spinner_wing1.rotation.z+=0.01;
+                // console.log(spinner_wing1.getPositionFromMatrix())
+                // spinner_wing1.rotation.y += 0.01;
+                // console.log(spinner_wing1.rotation.y)
+            }
            
             renderer.render( scene, camera );
 
