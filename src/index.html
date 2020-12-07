@@ -18,11 +18,11 @@
 
         var viscometer_container, viscometer_arrow,viscometer_container_cover;
         var txt_zero,txt_one,txt_two,txt_three,txt_four,txt_five,txt_six,txt_seven,txt_eight,txt_nine,txt_star,txt_shape,panel;
-        var plan,cube_stand,cube_viscometer,cube_mount;
+        var plane_number,cube_stand,cube_viscometer,cube_mount;
         var cylinder_vertical_pole,cylinder_horizontal_pole,cylinder_vertical_pole_small
         var container, controls;
         var camera, scene, renderer;
-        var spinner1,spinner2,spinner_wing1,spinner_wing2
+        var spinner1,spinner2,spinner_wing1,spinner_wing2,cylinder
         
         init();
         render();
@@ -41,8 +41,9 @@
             container = document.createElement( 'div' );
             document.body.appendChild( container );
             
-            camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.25, 20 );//()
-            camera.position.set( 0, 0, 10);
+            camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.25, 20 );//(FAR,)
+            camera.position.set( 20, 5, 10);
+            // camera.lookAt(-10, 1, 0);
 
             scene = new THREE.Scene();
             // var spriteText = new THREE.SpriteText({ text: 'Hello world!' });
@@ -50,6 +51,17 @@
             const group = new THREE.Group();
             var axesHelper = new THREE.AxesHelper( 5 ); // orange line is X, green is Y and Bule is Z (orange, green, blue) 
             scene.add( axesHelper );
+            //point light
+            const pointLightDistance = 1.5
+            const pointLight = new THREE.PointLight(  0xFFFFFF, 1, pointLightDistance );
+            pointLight.power = 800;
+            pointLight.decay = 2;
+            pointLight.distance = Infinity;
+            pointLight.position.set(0, 2, 0);
+
+            const sphereSize = 1;
+            const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
+
 
             var loader = new GLTFLoader().setPath( '/' );
 
@@ -101,6 +113,16 @@
                                 console.log("spinner_wing2")
                                 
 
+                            }else if( obj.isMesh&&obj.name == "Cylinder"){
+                                cylinder = obj   
+                                console.log("Cylinders")
+                                
+
+                            }else if( obj.isMesh&&obj.name == "Planenumber"){
+                                plane_number = obj   
+                                console.log("plane_number")
+                                
+
                             }else if( obj.isMesh && obj.name == "Text000"){
                                 txt_zero = obj   
                             }else if( obj.isMesh && obj.name == "Text001"){
@@ -138,12 +160,14 @@
                         const cube_mount_mat = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false } );
                         const panel_mat = new THREE.MeshBasicMaterial( { color: 0x9D9D9D, wireframe: false } );
                         const viscometer_mat = new THREE.MeshBasicMaterial( { color: 0xF0CD0E, wireframe: false } );
-                        const container_cover_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
-                        const spinner1_mat = new THREE.MeshBasicMaterial( { color: 0x0EF02D, wireframe: true } );
-                        const spinner2_mat = new THREE.MeshBasicMaterial( { color: 0x0EE2F0, wireframe: true } );
-                        const spinner3_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: true } );
-                        const spinner_wing1_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
-                        const spinner_wing2_mat = new THREE.MeshBasicMaterial( { color: 0xFE00B9, wireframe: false } );
+                        const container_cover_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false} );
+                        const spinner1_mat = new THREE.MeshBasicMaterial( { color: 0x0EF02D, wireframe: false } );
+                        const spinner2_mat = new THREE.MeshBasicMaterial( { color: 0x0EE2F0, wireframe: false } );
+                        const spinner3_mat = new THREE.MeshBasicMaterial( { color: 0xF00E0E, wireframe: false } );
+                        const spinner_wing1_mat = new THREE.MeshBasicMaterial( { color: 0x900C3F, wireframe: false } );
+                        const spinner_wing2_mat = new THREE.MeshBasicMaterial( { color: 0xF900C3F, wireframe: false } );
+                        const cylinder_mat = new THREE.MeshBasicMaterial( { color: 0x999999, wireframe: false } );
+                        const plane_number_mat = new THREE.MeshBasicMaterial( { color: 0x00FF59 , wireframe: false } );
 
                         
                         // //transparency
@@ -211,7 +235,7 @@
                         //spinner1
                         spinner1.material=spinner1_mat
                         spinner1.scale.set(0.08,1,0.1)
-                        spinner1.position.set(1.7,0.3,0)
+                        spinner1.position.set(1.65,0.3,0)
                         spinner1.color= 0xFF0000
                         
                         //spinner2
@@ -226,16 +250,28 @@
                         //wing1
                         spinner_wing1.material=spinner_wing1_mat
                         spinner_wing1.scale.set(0.1,0.1,0.15)
-                        spinner_wing1.position.set(0.3,-0.7,0)
+                        spinner_wing1.position.set(0.3,-0.7,-0.05)
                         spinner_wing1.rotation.z=Math.PI/2
-                        //wing2
+                        //wing2 - x direction
                         spinner_wing2.material=spinner_wing2_mat
                         spinner_wing2.scale.set(0.1,0.1,0.15)
-                        spinner_wing2.position.set(1.6,-0.7,1.35) 
+                        spinner_wing2.position.set(1.6,-0.7,1.4) 
                         spinner_wing2.rotation.x=0
                         spinner_wing2.rotation.y=Math.PI/2
                         spinner_wing2.rotation.z=Math.PI/2
-                        
+
+                         //cylinder
+                        cylinder.material=cylinder_mat
+                        cylinder.position.set(0,0,0) 
+                        cylinder.scale.set(0.4,0.3,0.4)
+                        cylinder.position.set(1.7,-0.7,0) 
+                        //plane number
+                        plane_number.material=plane_number_mat
+                        plane_number.position.set(0,0,0) 
+                        plane_number.scale.set(0.02,0.1,0.18)
+                        plane_number.position.set(1.8,1.6,1.12) 
+                        // plane_number.rotation.z = Math.PI/2
+                     
 
                         scene.add( panel );
                         scene.add( viscometer_container_cover );
@@ -248,15 +284,20 @@
                         scene.add( cube_mount );
                         scene.add( spinner1 );
                         
-                        scene.add( spinner2 );
+                        // scene.add( spinner2 );
                         scene.add( spinner_wing1 );
                         scene.add( spinner_wing2 );
+                        scene.add( cylinder );
+                        scene.add( plane_number );
                         // scene.add( box_helper );
                         // scene.add( spinner3 );
 
                         const box_helper = new THREE.BoxHelper( spinner_wing1 ,0xffff00);
-                        box_helper.material.color.set( 0x00ffff );
-                        scene.add( box_helper );
+                        // box_helper.material.color.set( 0x00ffff );
+                        // scene.add( box_helper );
+
+                        scene.add( pointLight );
+                        scene.add( pointLightHelper );
 
 
 
@@ -266,6 +307,9 @@
 
                         });
             renderer = new THREE.WebGLRenderer( { antialias: true } );
+             
+           
+
             renderer.setPixelRatio( window.devicePixelRatio );
             renderer.setSize( window.innerWidth, window.innerHeight );
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
