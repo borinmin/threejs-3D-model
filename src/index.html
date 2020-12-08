@@ -24,20 +24,23 @@
         var camera, scene, renderer;
         var spinner1,spinner2,spinner_wing1,spinner_wing2,cylinder
         var container_opacity;
-
+        var smokeParticles = [];
         // mesh 
         var container_mat;
-        
+        var clock, delta;
+        var rad_increment= 0;
+        var group_rotation;
+        var param_options;
         init();
         render();
 
         function init() {
             
 
+            group_rotation= new THREE.Object3D()
+            clock = new THREE.Clock();
 
-
-
-            container = document.createElement( 'div' );
+            container = document.createElement( 'div');
             document.body.appendChild( container );
             
             camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.25, 20 );//(FAR,)
@@ -45,11 +48,12 @@
             // camera.lookAt(-10, 1, 0);
 
             scene = new THREE.Scene();
+            scene.background= new THREE.Color( 0x0E232D );
             // var spriteText = new THREE.SpriteText({ text: 'Hello world!' });
             // scene.add( spriteText );
             const group = new THREE.Group();
             var axesHelper = new THREE.AxesHelper( 5 ); // orange line is X, green is Y and Bule is Z (orange, green, blue) 
-            scene.add( axesHelper );
+            // scene.add( axesHelper );
             //point light
             const pointLightDistance = 1.5
             const pointLight = new THREE.PointLight(  0xFFFFFF, 1, pointLightDistance );
@@ -153,11 +157,11 @@
                         // console.log(group)
                         // scene.add( gltf.scene );
                         const material          = new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe:  false } );
-                        container_mat     = new THREE.MeshBasicMaterial( { color: 0x00FF59, wireframe: false ,opacity:0.5,transparent:true,depthWrite: false} );
+                         container_mat     = new THREE.MeshBasicMaterial( { color: 0x00FF59, wireframe: false ,opacity:0.5,transparent:true,depthWrite: false} );
                         const bottom_stand      = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
                         const h_pole            = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false } );
                         const cube_mount_mat    = new THREE.MeshBasicMaterial( { color: 0x5D6D7E, wireframe: false,opacity:0.9,transparent:true,depthWrite: false} );
-                        const panel_mat         = new THREE.MeshBasicMaterial( { color: 0x00FF59, wireframe: false } );
+                        const panel_mat         = new THREE.MeshBasicMaterial( { color: 0x2E3234  , wireframe: false } );
                         const viscometer_mat    = new THREE.MeshBasicMaterial( { color: 0x007BD1 , wireframe: false } );
                         const container_cover_mat = new THREE.MeshBasicMaterial( { color: 0x5D6D7E  , wireframe: false} );
                         const spinner1_mat      = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
@@ -168,15 +172,7 @@
                         const cylinder_mat      = new THREE.MeshBasicMaterial( { color: 0x92EEE2, wireframe: false, opacity:1,transparent:true,depthWrite: false} );
                         const plane_number_mat  = new THREE.MeshBasicMaterial( { color: 0x00FF59 , wireframe: false } );
 
-                        
-                        // //transparency
-                        // const material = new THREE.MeshPhongMaterial({'FE00B9',
-                        //                                                 opacity: 0.5,
-                        //                                                 transparent: true,
-                        //                                             });
-
-                        // const bottom_stand = new THREE.MeshBasicMaterial( { color: 0x0000FF, wireframe: false } );
-                        //cube_stand
+                    
                         
                         panel.material=panel_mat
                         panel.scale.set(0.3,0.1,0.08)
@@ -244,6 +240,7 @@
                         spinner_wing1.scale.set(0.1,0.1,0.15)
                         spinner_wing1.position.set(0.3,-0.7,-0.05)
                         spinner_wing1.rotation.z=Math.PI/2
+                        // spinner_wing1.rotation.x=Math.PI/2
                         //wing2 - x direction
                         spinner_wing2.material=spinner_wing2_mat
                         spinner_wing2.scale.set(0.1,0.1,0.15)
@@ -284,53 +281,31 @@
                         // scene.add( box_helper );
                         // scene.add( spinner3 );
 
-                        const box_helper = new THREE.BoxHelper( spinner_wing1 ,0xffff00);
+                        // const box_helper = new THREE.BoxHelper( spinner_wing1 ,0xffff00);
                         // box_helper.material.color.set( 0x00ffff );
                         // scene.add( box_helper );
 
-                        scene.add( pointLight );
-                        scene.add( pointLightHelper );
-                        // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                        // scene.add( pointLight );
+                        // scene.add( pointLightHelper );
+                        
 
-                        var options = {
-                                velx: 0,
-                                vely: 0,
-                                camera: {
-                                    speed: 0.0001
-                                },
-                                stop: function() {
-                                    this.velx = 0;
-                                    this.vely = 0;
-                                },
-                                reset: function() {
-                                    this.velx = 0.1;
-                                    this.vely = 0.1;
-                                    camera.position.z = 75;
-                                    camera.position.x = 0;
-                                    camera.position.y = 0;
-                                    cube.scale.x = 1;
-                                    cube.scale.y = 1;
-                                    cube.scale.z = 1;
-                                    cube.material.wireframe = true;
-                                    container_mat.opacity=1                   
+                        //change position to its center 
+                        spinner_wing1.geometry.translate(1,2,0)
+                        spinner_wing1.position.copy(new THREE.Vector3(0.5, -0.8, 0))
+                        var box = new THREE.Box3().setFromObject(spinner_wing1 );
+                        box.getCenter( spinner_wing1.position );
+                        spinner_wing1.geometry.center();
+                        //wing2 
+                        spinner_wing2.geometry.translate(1,2,0)
+                        spinner_wing2.position.copy(new THREE.Vector3(1.5, -0.8, 1.2))
+                        var box = new THREE.Box3().setFromObject(spinner_wing2 );
+                        box.getCenter( spinner_wing2.position );
+                        spinner_wing2.geometry.center();
+                        //end 
 
-                                }
-                                };
-
-                                const gui = new GUI();
-                                var cam = gui.addFolder('Camera');
-                                cam.add(options.camera, 'speed', 0, 0.0010).listen();
-                                // cam.add(camera.position, 'y', 0, 100).listen();
-                                cam.open();
-                                var container = gui.addFolder('Container');
-                                // container.add(options.container ,'color',).listen()
-                                console.log("container_mat",container_mat)
-                                container.add(container_mat ,'opacity',0,1).name("Opacity").listen() //(,,min,max)
-
-                                container.open()
-
+                        parameter()
                         // roughnessMipmapper.dispose();
-
+                        // smoke()
                         render();
 
                         });
@@ -363,7 +338,7 @@
             controls.update();
 
             window.addEventListener( 'resize', onWindowResize, false );
-            console.log("controls",controls)
+            // console.log("controls",controls)
 
             
         }
@@ -391,20 +366,115 @@
             render();
 
         }
-        // const y = spinner_wing1.rotation.y
-        // spinner_wing1.rotation.y -=y;
+        function parameter(){
+            param_options = {
+                                speed: 0,
+                              
+                                stop: function() {
+                                    this.speed=0;
+                                },
+                                reset: function() {
+                                    this.velx = 0.1;
+                                    this.vely = 0.1;
+                                    camera.position.z = 75;
+                                    camera.position.x = 0;
+                                    camera.position.y = 0;
+                                    cube.scale.x = 1;
+                                    cube.scale.y = 1;
+                                    cube.scale.z = 1;
+                                    cube.material.wireframe = true;
+                                    container_mat.opacity=1                   
+
+                                },
+                                spinner: new function(){
+                                    this.speed =0.01
+                                
+                                }
+                            };
+                   
+                            
+                                const gui = new GUI();
+                                var cam = gui.addFolder('Camera');
+                                // cam.add(options.camera, 'speed', 0, 0.0010).listen();
+                                // cam.add(camera.position, 'y', 0, 100).listen();
+                                cam.open();
+                                var container = gui.addFolder('Object Container');
+                                container.add(container_mat ,'opacity',0,1).name("Opacity").listen() //(,,min,max)
+                                var group_spinner = gui.addFolder('Speed Control');
+                                group_spinner.add(param_options.spinner,'speed',0,0.5).name("Speed").listen()
+                                group_spinner.open()
+
+                                gui.add(param_options,'stop')
+        }   
+        
+        function smoke(){
+                // stats = new Stats();
+                // stats.setMode(0);
+                // stats.domElement.style.position = 'absolute';
+                // stats.domElement.style.left = '0px';
+                // stats.domElement.style.top = '0px';
+                // document.body.appendChild(stats.domElement);
+                const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+                camera.position.z = 1000;
+                scene.add( camera );
+                const geometry = new THREE.CubeGeometry( 200, 200, 200 );
+                const material = new THREE.MeshLambertMaterial( { color: 0xaa6666, wireframe: false } );
+                const vamesh = new THREE.Mesh( geometry, material );
+                //scene.add( mesh );
+                const cubeSineDriver = 0;
+            
+                const textGeo = new THREE.PlaneGeometry(300,300);
+                THREE.ImageUtils.crossOrigin = ''; //Need this to pull in crossdomain images from AWS
+                const textTexture = THREE.ImageUtils.loadTexture('https://s3-us-west-2.amazonaws.com/s.cdpn.io/95637/quickText.png');
+                const textMaterial = new THREE.MeshLambertMaterial({color: 0x00ffff, opacity: 1, map: textTexture, transparent: true, blending: THREE.AdditiveBlending})
+                const text = new THREE.Mesh(textGeo,textMaterial);
+                text.position.z = 800;
+                scene.add(text);
+
+                const light = new THREE.DirectionalLight(0xffffff,0.5);
+                light.position.set(-1,0,1);
+                scene.add(light);
+            
+                const smokeTexture = THREE.ImageUtils.loadTexture('https://s3-us-west-2.amazonaws.com/s.cdpn.io/95637/Smoke-Element.png');
+                const smokeMaterial = new THREE.MeshLambertMaterial({color: 0x00dddd, map: smokeTexture, transparent: true});
+                const smokeGeo = new THREE.PlaneGeometry(300,300);
+                smokeParticles = [];
+
+
+                for (var  p = 0; p < 150; p++) {
+                    var particle = new THREE.Mesh(smokeGeo,smokeMaterial);
+                    particle.position.set(Math.random()*500-250,Math.random()*500-250,Math.random()*1000-100);
+                    particle.rotation.z = Math.random() * 360;
+                    scene.add(particle);
+                    smokeParticles.push(particle);
+                }
+                document.body.appendChild( renderer.domElement );
+                evolveSmoke()
+
+        }
+        function evolveSmoke() {
+                var sp = smokeParticles.length;
+                while(sp--) {
+                    smokeParticles[sp].rotation.z += (delta * 0.2);
+                }
+            }
+        function rotate(){
+            
+            if(spinner_wing1){
+                spinner_wing1.rotation.y+=param_options.spinner.speed;
+            
+            }
+            if(spinner_wing2){
+     
+            spinner_wing2.rotation.y+= param_options.spinner.speed
+        }}
+
         function render() {
             requestAnimationFrame( render );
-            console.log("dddd",spinner_wing1);
-            if(spinner_wing1){
-                // spinner_wing1.rotation.x +=0.01;
-                spinner_wing1.rotation.z+=0.01;
-                // console.log(spinner_wing1.getPositionFromMatrix())
-                // spinner_wing1.rotation.y += 0.01;
-                // console.log(spinner_wing1.rotation.y)
-            }
-           
+            // smoke()
+            rotate()
             renderer.render( scene, camera );
+            // console.log("spinner_speed",param_options.stop.speed)
 
         }
     </script>
